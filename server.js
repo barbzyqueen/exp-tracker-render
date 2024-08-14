@@ -14,10 +14,19 @@ const { Pool } = require('pg');
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-    origin: 'https://exp-tracker-render-latest.onrender.com', // Replace with your Vercel frontend URL
-    credentials: true
-}));
+
+// app.use(cors({
+//     origin: 'https://exp-tracker-render-latest.onrender.com', // Replace with your Vercel frontend URL
+//     credentials: true
+// }));
+
+const corsOptions = {
+    origin: 'https://exp-tracker-postgres.onrender.com', // Replace with your frontend URL
+    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  };
+
+app.use(cors(corsOptions));
+
 app.use(cookieParser());
 
 // Disable browser caching middleware
