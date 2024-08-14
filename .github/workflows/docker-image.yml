@@ -5,18 +5,18 @@ on:
     branches:
       - main
 
-permissions:
-  contents: write    # Allows pushing changes to the repository
-  packages: write    # Allows publishing Docker images
-  workflows: read    # Allows reading workflow files (adjust to write if needed)
-  secrets: read      # Allows accessing repository secrets
-  commit-statuses: write # Allows updating commit statuses (if needed)
-  deployments: write # Allows managing deployments (if needed)
-  actions: read      # Allows viewing Actions workflows, runs, and artifacts (adjust to write if needed)
-
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write    # Allows pushing changes to the repository
+      packages: write    # Allows publishing Docker images
+      workflows: read    # Allows reading workflow files (adjust to write if needed)
+      secrets: read      # Allows accessing repository secrets
+      commit-statuses: write # Allows updating commit statuses (if needed)
+      deployments: write # Allows managing deployments (if needed)
+      actions: read      # Allows viewing Actions workflows, runs, and artifacts (adjust to write if needed)
 
     steps:
     - name: Checkout code
