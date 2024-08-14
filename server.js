@@ -15,7 +15,7 @@ const { Pool } = require('pg');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: '*', // Replace with your Vercel frontend URL
+    origin: 'https://exp-tracker-render-latest.onrender.com', // Replace with your Vercel frontend URL
     credentials: true
 }));
 app.use(cookieParser());
