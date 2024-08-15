@@ -116,6 +116,8 @@ app.use(session({
     }
 }));
 
+
+
 // Middleware to clear cookie if session doesn't exist
 app.use((req, res, next) => {
     if (req.cookies.user_sid && !req.session.user) {
@@ -128,6 +130,15 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     console.log('Session Data:', req.session);
     next();
+});
+
+// TEST SESSION ROUTE
+app.get('/api/test-session', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ message: 'Session is set', session: req.session });
+    } else {
+        res.status(200).json({ message: 'No session' });
+    }
 });
 
 // Routes for user registration, login, and expenses
