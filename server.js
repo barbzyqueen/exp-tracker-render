@@ -27,21 +27,24 @@ app.use(express.urlencoded({ extended: true }));
 
 // Dynamic CORS configuration
 const allowedOrigins = [
-    'https://exp-tracker-render-latest.onrender.com', // Your frontend URL
-    'https://exp-tracker-postgres.onrender.com'      // Your backend URL
+    'https://exp-tracker-render-latest.onrender.com',
+    'https://exp-tracker-postgres.onrender.com'
 ];
 
-const corsOptions = {
-    origin: (origin, callback) => {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    optionsSuccessStatus: 200
-};
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
 
 
 app.use(cookieParser());
