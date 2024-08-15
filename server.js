@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Dynamic CORS configuration
 const allowedOrigins = [
-    'https://exp-tracker-render-latest.onrender.com',
+    'https://exp-tracker-render-latest.onrender.com'
 ];
 
 app.use((req, res, next) => {
@@ -141,7 +141,7 @@ app.use((req, res, next) => {
 });
 
 // Routes for user registration, login, and expenses
-app.post('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
     try {
         console.log("Received registration request:", req.body);
 
@@ -160,7 +160,7 @@ app.post('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c
     }
 });
 
-app.post('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
     try {
         const { rows: users } = await pool.query('SELECT * FROM users WHERE email = $1', [req.body.email]);
         if (users.length === 0) return res.status(404).json("User not found");
@@ -175,7 +175,7 @@ app.post('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c
     }
 });
 
-app.get('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/current-user', (req, res) => {
+app.get('/api/current-user', (req, res) => {
     if (req.session.user) {
         res.status(200).json({ username: req.session.user.username });
     } else {
@@ -190,7 +190,7 @@ function authenticateUser(req, res, next) {
     next();
 }
 
-app.post('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/expenses', authenticateUser, async (req, res) => {
+app.post('/api/expenses', authenticateUser, async (req, res) => {
     const { category, amount, date } = req.body;
     const userId = req.session.user.id;
 
@@ -202,7 +202,7 @@ app.post('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c
     }
 });
 
-app.get('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/expenses', authenticateUser, async (req, res) => {
+app.get('/api/expenses', authenticateUser, async (req, res) => {
     const userId = req.session.user.id;
 
     try {
@@ -213,7 +213,7 @@ app.get('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c7
     }
 });
 
-app.put('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/expenses/:id', authenticateUser, async (req, res) => {
+app.put('/api/expenses/:id', authenticateUser, async (req, res) => {
     const expenseId = req.params.id;
     const { category, amount, date } = req.body;
     const userId = req.session.user.id;
@@ -230,7 +230,7 @@ app.put('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c7
     }
 });
 
-app.delete('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/expenses/:id', authenticateUser, async (req, res) => {
+app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
     const expenseId = req.params.id;
     const userId = req.session.user.id;
 
@@ -246,7 +246,7 @@ app.delete('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l4
     }
 });
 
-app.post('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/logout', (req, res) => {
+app.post('/api/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             return res.status(500).json("Error logging out");
@@ -256,7 +256,7 @@ app.post('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c
     });
 });
 
-app.get('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/api/check-session', (req, res) => {
+app.get('/api/check-session', (req, res) => {
     if (req.session.user) {
         res.status(200).json({ loggedIn: true });
     } else {
@@ -264,12 +264,12 @@ app.get('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c7
     }
 });
 
-app.get('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Test route to verify database connectivity
-app.get('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/db-test', async (req, res) => {
+app.get('/db-test', async (req, res) => {
     try {
         const result = await pool.query('SELECT NOW()');
         res.status(200).json({ message: "Database connection successful", timestamp: result.rows[0].now });
