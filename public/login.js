@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok && data.userId) {
                 localStorage.setItem('userId', data.userId);
-                window.location.href = '/index.html'; // Redirect to the homepage after login
+                window.location.href = 'https://exp-tracker-render-latest.onrender.com/index.html'; // Redirect to the homepage after login
             } else {
                 authMsg.textContent = `Login failed: ${data.message || 'Please check your credentials and try again.'}`;
                 authMsg.style.color = 'red';
