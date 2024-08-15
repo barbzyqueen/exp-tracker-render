@@ -20,20 +20,14 @@ const allowedOrigins = [
     'https://exp-tracker-render-latest.onrender.com' // Update with your Vercel frontend URL
 ];
 
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-    }
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-    next();
-});
+const corsOptions = {
+    origin: allowedOrigins,
+    methods: 'GET, POST, PUT, DELETE, OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true // Allow cookies to be sent with requests
+};
+
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
@@ -116,9 +110,9 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 600000, // 10 minutes
-        httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
+        httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
-        sameSite: 'None' // Required if using cookies with CORS
+        sameSite: 'None'
     }
 }));
 
@@ -127,6 +121,12 @@ app.use((req, res, next) => {
     if (req.cookies.user_sid && !req.session.user) {
         res.clearCookie('user_sid', { path: '/' });
     }
+    next();
+});
+
+// Middleware to debug session
+app.use((req, res, next) => {
+    console.log('Session Data:', req.session);
     next();
 });
 
@@ -254,6 +254,14 @@ app.get('/api/check-session', (req, res) => {
     }
 });
 
+app.get('/api/test-session', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ message: 'Session is set', session: req.session });
+    } else {
+        res.status(200).json({ message: 'No session' });
+    }
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -270,8 +278,8 @@ app.get('/db-test', async (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
+    console.error('Error:', err.stack);
+    res.status(500).json({ message: 'Internal Server Error', error: err.message });
 });
 
 const port = process.env.PORT || 3000;
