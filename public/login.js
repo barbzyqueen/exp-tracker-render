@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const authMsg = document.getElementById('auth-msg');
 
         try {
-            const response = await fetch('https://exp-tracker-render-latest.onrender.com/api/login', { // Updated URL
+            const response = await fetch('https://exp-tracker-postgres.onrender.com/api/login', { // Updated URL
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
