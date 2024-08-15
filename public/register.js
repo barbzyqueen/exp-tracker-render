@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             authMsg.textContent = 'Registering...';
             authMsg.style.color = 'blue';
 
-            const response = await fetch('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a.oregon-postgres.render.com/expense_tracker_db_9g3g/api/register', {
+            const response = await fetch('postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g/expense_tracker_db_9g3g/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
