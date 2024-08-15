@@ -2,22 +2,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchUserData() {
         try {
-            const response = await fetch('https://exp-tracker-render-latest.onrender.com/api/current-user', { credentials: 'include' });
+            const response = await fetch('https://exp-tracker-postgres.onrender.com/api/current-user', { credentials: 'include' });
             if (!response.ok) throw new Error('Not authenticated');
             const data = await response.json();
             document.getElementById('username').textContent = data.username;
         } catch (error) {
             console.error('Error fetching user info:', error);
-            window.location.href = '/login.html';
+            window.location.href = 'https://exp-tracker-render-latest.onrender.com/login.html';
         }
     }
 
     async function checkLogin() {
         try {
-            const response = await fetch('https://exp-tracker-render-latest.onrender.com/api/check-session', { method: 'GET', credentials: 'include' });
+            const response = await fetch('https://exp-tracker-postgres.onrender.com/api/check-session', { method: 'GET', credentials: 'include' });
             if (!response.ok) throw new Error('Not authenticated');
         } catch (err) {
-            window.location.href = '/login.html';
+            window.location.href = 'https://exp-tracker-render-latest.onrender.com/login.html';
         }
     }
 
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = document.getElementById('date').value;
 
         try {
-            const response = await fetch('https://exp-tracker-render-latest.onrender.com/api/expenses', {
+            const response = await fetch('https://exp-tracker-postgres.onrender.com/api/expenses', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = document.getElementById('editDate').value;
 
         try {
-            const response = await fetch(`https://exp-tracker-render-latest.onrender.com/api/expenses/${expenseId}`, {
+            const response = await fetch(`https://exp-tracker-postgres.onrender.com/api/expenses/${expenseId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.style.color = 'blue';
 
         try {
-            const response = await fetch(`https://exp-tracker-render-latest.onrender.com/api/expenses/${expenseId}`, {
+            const response = await fetch(`https://exp-tracker-postgres.onrender.com/api/expenses/${expenseId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.style.color = 'blue';
 
         try {
-            const response = await fetch('https://exp-tracker-render-latest.onrender.com/api/expenses', {
+            const response = await fetch('https://exp-tracker-postgres.onrender.com/api/expenses', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
@@ -172,13 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleLogout() {
         try {
-            const response = await fetch('https://exp-tracker-render-latest.onrender.com/api/logout', {
+            const response = await fetch('https://exp-tracker-postgres.onrender.com/api/logout', {
                 method: 'POST',
                 credentials: 'include'
             });
 
             if (response.ok) {
-                window.location.href = '/login.html';
+                window.location.href = 'https://exp-tracker-render-latest.onrender.com/login.html';
             } else {
                 console.error('Logout failed');
             }
