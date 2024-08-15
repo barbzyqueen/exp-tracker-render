@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             authMsg.textContent = 'Registering...';
             authMsg.style.color = 'blue';
 
-            const response = await fetch('https://exp-tracker-render-latest.onrender.com/api/register', {
+            const response = await fetch('https://exp-tracker-postgres.onrender.com/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
