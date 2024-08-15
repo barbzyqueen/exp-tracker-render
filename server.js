@@ -15,19 +15,9 @@ const { Pool } = require('pg');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// app.use(cors({
-//     origin: 'https://exp-tracker-render-latest.onrender.com', // Replace with your Vercel frontend URL
-//     credentials: true
-// }));
-
-// const corsOptions = {
-//     origin: 'https://exp-tracker-render-latest.onrender.com', // Replace with your frontend URL
-//     optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
-//   };
-
-// Dynamic CORS configuration
+// CORS configuration
 const allowedOrigins = [
-    'https://exp-tracker-render-latest.onrender.com'
+    'https://exp-tracker-render-latest.onrender.com' // Update with your Vercel frontend URL
 ];
 
 app.use((req, res, next) => {
@@ -44,7 +34,6 @@ app.use((req, res, next) => {
     }
     next();
 });
-
 
 app.use(cookieParser());
 
@@ -126,16 +115,17 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 600000,
+        maxAge: 600000, // 10 minutes
         httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
-        secure: process.env.NODE_ENV === 'production'
+        secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
+        sameSite: 'None' // Required if using cookies with CORS
     }
 }));
 
 // Middleware to clear cookie if session doesn't exist
 app.use((req, res, next) => {
     if (req.cookies.user_sid && !req.session.user) {
-        res.clearCookie('user_sid');
+        res.clearCookie('user_sid', { path: '/' });
     }
     next();
 });
@@ -251,7 +241,7 @@ app.post('/api/logout', (req, res) => {
         if (err) {
             return res.status(500).json("Error logging out");
         }
-        res.clearCookie('user_sid');
+        res.clearCookie('user_sid', { path: '/' });
         res.status(200).json("Logout successful");
     });
 });
@@ -274,11 +264,17 @@ app.get('/db-test', async (req, res) => {
         const result = await pool.query('SELECT NOW()');
         res.status(200).json({ message: "Database connection successful", timestamp: result.rows[0].now });
     } catch (err) {
-        res.status(500).json({ message: "Database connection failed", error: err });
+        res.status(500).json({ message: "Database connection error", error: err });
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
