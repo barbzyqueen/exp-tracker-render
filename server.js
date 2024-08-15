@@ -25,13 +25,24 @@ app.use(express.urlencoded({ extended: true }));
 //     optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 //   };
 
-const corsOptions = {
-    credentials: true
-    origin: ['https://exp-tracker-render-latest.onrender.com', 'https://exp-tracker-postgres.onrender.com'] // Replace with your frontend URL
-    
-  };
+// Dynamic CORS configuration
+const allowedOrigins = [
+    'https://exp-tracker-render-latest.onrender.com', // Your frontend URL
+    'https://exp-tracker-postgres.onrender.com'      // Your backend URL
+];
 
-app.use(cors(corsOptions));
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
 
 app.use(cookieParser());
 
