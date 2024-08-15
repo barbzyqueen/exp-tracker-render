@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 // Dynamic CORS configuration
 const allowedOrigins = [
     'https://exp-tracker-render-latest.onrender.com',
-    'postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a.oregon-postgres.render.com/expense_tracker_db_9g3g'
+    'postgresql://barbara:t6QAgCVxwIjTB3DgBlZUBffz5bhremHw@dpg-cqs81rl6l47c73a129l0-a/expense_tracker_db_9g3g'
 ];
 
 app.use((req, res, next) => {
