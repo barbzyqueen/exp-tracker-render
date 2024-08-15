@@ -27,7 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ email, username, password })
             });
 
+            console.log('Response:', response);
+
             const data = await response.json();
+            console.log('Data:', data);
 
             if (!response.ok) {
                 if (response.status === 409) {
@@ -47,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 2000); // Redirect after 2 seconds
             }
         } catch (err) {
+            console.error('Fetch error:', err);
             authMsg.textContent = `Error: ${err}`;
             authMsg.style.color = 'red';
         }
