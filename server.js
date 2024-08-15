@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
 const allowedOrigins = [
-    'https://exp-tracker-render-latest.onrender.com' // Update with your Vercel frontend URL
+    'https://exp-tracker-render-latest.onrender.com' // Update with your frontend URL
 ];
 
 const corsOptions = {
@@ -29,20 +29,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(cookieParser());
-
-// Disable browser caching middleware
-app.use((req, res, next) => {
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
-    next();
-});
-
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Database connection
+// Session store configuration
 const pool = new Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
@@ -51,58 +38,12 @@ const pool = new Pool({
     port: process.env.DB_PORT || 5432,
 });
 
-// Test database connection and create tables
-pool.query('SELECT NOW()', (err, res) => {
-    if (err) {
-        console.error('Error connecting to PostgreSQL:', err.stack);
-        return;
-    }
-    console.log('Connected to PostgreSQL:', res.rows[0]);
-
-    const createTables = async () => {
-        try {
-            await pool.query(`
-                CREATE TABLE IF NOT EXISTS users (
-                    id SERIAL PRIMARY KEY,
-                    email VARCHAR(100) UNIQUE NOT NULL,
-                    username VARCHAR(50) NOT NULL,
-                    password VARCHAR(255) NOT NULL
-                )
-            `);
-
-            await pool.query(`
-                CREATE TABLE IF NOT EXISTS expenses (
-                    id SERIAL PRIMARY KEY,
-                    user_id INT REFERENCES users(id),
-                    category VARCHAR(50),
-                    amount DECIMAL(10, 2),
-                    date DATE
-                )
-            `);
-
-            await pool.query(`
-                CREATE TABLE IF NOT EXISTS sessions (
-                    sid VARCHAR PRIMARY KEY,
-                    sess TEXT NOT NULL,
-                    expire TIMESTAMPTZ NOT NULL
-                )
-            `);
-
-            console.log("Tables created/checked");
-        } catch (err) {
-            console.error("Error creating tables:", err);
-        }
-    };
-
-    createTables();
-});
-
-// Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
     tableName: 'sessions'
 });
 
+app.use(cookieParser());
 app.use(session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET || 'your_secret_key',
@@ -112,11 +53,9 @@ app.use(session({
         maxAge: 600000, // 10 minutes
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
-        sameSite: 'None'
+        sameSite: 'None' // Required for cross-site cookies
     }
 }));
-
-
 
 // Middleware to clear cookie if session doesn't exist
 app.use((req, res, next) => {
@@ -144,8 +83,6 @@ app.get('/api/test-session', (req, res) => {
 // Routes for user registration, login, and expenses
 app.post('/api/register', async (req, res) => {
     try {
-        console.log("Received registration request:", req.body);
-
         const { rows: existingUsers } = await pool.query('SELECT * FROM users WHERE email = $1', [req.body.email]);
         if (existingUsers.length > 0) return res.status(409).json("User already exists");
 
@@ -265,14 +202,6 @@ app.get('/api/check-session', (req, res) => {
     }
 });
 
-app.get('/api/test-session', (req, res) => {
-    if (req.session.user) {
-        res.status(200).json({ message: 'Session is set', session: req.session });
-    } else {
-        res.status(200).json({ message: 'No session' });
-    }
-});
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -294,6 +223,5 @@ app.use((err, req, res, next) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+app.listen
+            
