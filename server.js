@@ -20,9 +20,15 @@ app.use(express.urlencoded({ extended: true }));
 //     credentials: true
 // }));
 
+// const corsOptions = {
+//     origin: 'https://exp-tracker-render-latest.onrender.com', // Replace with your frontend URL
+//     optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+//   };
+
 const corsOptions = {
-    origin: 'https://exp-tracker-render-latest.onrender.com', // Replace with your frontend URL
-    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+    credentials: true
+    origin: ['https://exp-tracker-render-latest.onrender.com', 'https://exp-tracker-postgres.onrender.com'] // Replace with your frontend URL
+    
   };
 
 app.use(cors(corsOptions));
