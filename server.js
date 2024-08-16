@@ -106,7 +106,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
         sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for cross-site cookies in production
         path: '/' // Ensure the cookie is accessible across the site
