@@ -89,6 +89,8 @@ const sessionStore = new pgSession({
 
 app.use(cookieParser());
 
+const isProduction = process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS === 'true';
+
 app.use(session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET || 'your_secret_key',
@@ -97,9 +99,9 @@ app.use(session({
     cookie: {
         maxAge: 86400000, // 1 day
         httpOnly: true,
-        secure: false, // Set this to false if you're not using HTTPS
-        sameSite: 'Lax', // Use Lax or Strict depending on your needs
-        path: '/' // Ensure the cookie is accessible across the site
+        secure: isProduction, // Only true if production and FORCE_HTTPS is true
+        sameSite: isProduction ? 'None' : 'Lax',
+        path: '/'
     }
 }));
 
