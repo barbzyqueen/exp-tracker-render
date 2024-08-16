@@ -33,6 +33,7 @@ app.use(cors(corsOptions));
 const pool = new Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
+    url: process.env.DB_URL,
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT || 5432,
