@@ -126,14 +126,24 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Endpoint to get current user information
+// Endpoint to get current user 
 app.get('/api/current-user', (req, res) => {
     if (req.session.user) {
+        console.log('Current User:', req.session.user); // Log current user for debugging
         res.status(200).json({ username: req.session.user.username });
     } else {
+        console.log('No session user found');
         res.status(401).json({ message: 'Not authenticated' });
     }
 });
+
+// app.get('/api/current-user', (req, res) => {
+//     if (req.session.user) {
+//         res.status(200).json({ username: req.session.user.username });
+//     } else {
+//         res.status(401).json({ message: 'Not authenticated' });
+//     }
+// });
 
 // Middleware to check if the user is authenticated
 function authenticateUser(req, res, next) {
