@@ -29,7 +29,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Session store configuration
+// Database connection using Pool
 const pool = new Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
@@ -38,9 +38,10 @@ const pool = new Pool({
     port: process.env.DB_PORT || 5432,
 });
 
+// Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
-    tableName: 'sessions'
+    tableName: 'sessions',
 });
 
 app.use(cookieParser());
@@ -71,16 +72,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// TEST SESSION ROUTE
-app.get('/api/test-session', (req, res) => {
-    if (req.session.user) {
-        res.status(200).json({ message: 'Session is set', session: req.session });
-    } else {
-        res.status(200).json({ message: 'No session' });
-    }
-});
-
 // Routes for user registration, login, and expenses
+
+// User registration route
 app.post('/api/register', async (req, res) => {
     try {
         const { rows: existingUsers } = await pool.query('SELECT * FROM users WHERE email = $1', [req.body.email]);
@@ -98,6 +92,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+// User login route
 app.post('/api/login', async (req, res) => {
     try {
         const { rows: users } = await pool.query('SELECT * FROM users WHERE email = $1', [req.body.email]);
@@ -109,10 +104,12 @@ app.post('/api/login', async (req, res) => {
         req.session.user = users[0];
         res.status(200).json({ message: "Login successful", userId: users[0].id });
     } catch (err) {
+        console.log("Internal server error:", err);
         res.status(500).json("Internal Server Error");
     }
 });
 
+// Endpoint to get current user information
 app.get('/api/current-user', (req, res) => {
     if (req.session.user) {
         res.status(200).json({ username: req.session.user.username });
@@ -121,6 +118,7 @@ app.get('/api/current-user', (req, res) => {
     }
 });
 
+// Middleware to check if the user is authenticated
 function authenticateUser(req, res, next) {
     if (!req.session.user) {
         return res.status(401).json("Unauthorized");
@@ -128,6 +126,7 @@ function authenticateUser(req, res, next) {
     next();
 }
 
+// Route to add a new expense
 app.post('/api/expenses', authenticateUser, async (req, res) => {
     const { category, amount, date } = req.body;
     const userId = req.session.user.id;
@@ -136,10 +135,12 @@ app.post('/api/expenses', authenticateUser, async (req, res) => {
         await pool.query('INSERT INTO expenses (user_id, category, amount, date) VALUES ($1, $2, $3, $4)', [userId, category, amount, date]);
         res.status(201).json("Expense added successfully");
     } catch (err) {
+        console.log("Error adding expense:", err);
         res.status(400).json("Error adding expense");
     }
 });
 
+// Route to get all expenses for the authenticated user
 app.get('/api/expenses', authenticateUser, async (req, res) => {
     const userId = req.session.user.id;
 
@@ -147,10 +148,12 @@ app.get('/api/expenses', authenticateUser, async (req, res) => {
         const { rows: expenses } = await pool.query('SELECT * FROM expenses WHERE user_id = $1 ORDER BY date DESC', [userId]);
         res.status(200).json(expenses);
     } catch (err) {
+        console.log("Error retrieving expenses:", err);
         res.status(400).json("Error retrieving expenses");
     }
 });
 
+// Route to update an existing expense
 app.put('/api/expenses/:id', authenticateUser, async (req, res) => {
     const expenseId = req.params.id;
     const { category, amount, date } = req.body;
@@ -164,10 +167,12 @@ app.put('/api/expenses/:id', authenticateUser, async (req, res) => {
         }
         res.status(200).json("Expense updated successfully");
     } catch (err) {
+        console.log("Error updating expense:", err);
         res.status(400).json("Error updating expense");
     }
 });
 
+// Route to delete an existing expense
 app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
     const expenseId = req.params.id;
     const userId = req.session.user.id;
@@ -180,13 +185,16 @@ app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
         }
         res.status(200).json("Expense deleted successfully");
     } catch (err) {
+        console.log("Error deleting expense:", err);
         res.status(400).json("Error deleting expense");
     }
 });
 
+// Logout route
 app.post('/api/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
+            console.log("Error logging out:", err);
             return res.status(500).json("Error logging out");
         }
         res.clearCookie('user_sid', { path: '/' });
@@ -194,6 +202,7 @@ app.post('/api/logout', (req, res) => {
     });
 });
 
+// Route to check session status
 app.get('/api/check-session', (req, res) => {
     if (req.session.user) {
         res.status(200).json({ loggedIn: true });
@@ -202,8 +211,12 @@ app.get('/api/check-session', (req, res) => {
     }
 });
 
+// Serve static files (like the frontend)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve the homepage
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', '/index.html'));
 });
 
 // Test route to verify database connectivity
@@ -212,16 +225,19 @@ app.get('/db-test', async (req, res) => {
         const result = await pool.query('SELECT NOW()');
         res.status(200).json({ message: "Database connection successful", timestamp: result.rows[0].now });
     } catch (err) {
+        console.log("Database connection error:", err);
         res.status(500).json({ message: "Database connection error", error: err });
     }
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error('Error:', err.stack);
-    res.status(500).json({ message: 'Internal Server Error', error: err.message });
+    console.error('Errorcontinuing...', err);
+    res.status(500).json({ message: "Internal Server Error" });
 });
 
-const port = process.env.PORT || 3000;
-app.listen
-            
+// Start the server
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
