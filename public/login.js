@@ -1,36 +1,42 @@
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form');
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const authMsg = document.getElementById('auth-msg');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    console.log('Email:', email); // Debugging: Check email value
-    console.log('Password:', password); // Debugging: Check password value
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const authMsg = document.getElementById('auth-msg');
 
-    try {
-        const response = await fetch('/api/login', { 
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
+        try {
+            // Making a POST request to the server with credentials included
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include', // Ensures cookies (e.g., session cookie) are sent with the request
+                body: JSON.stringify({ email, password })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
+            console.log('Response Data:', data); // Log the response data for debugging
 
-        console.log('Response Data:', data); // Debugging: Check response data
-
-        if (response.ok && data.userId) {
-            localStorage.setItem('userId', data.userId);
-            window.location.href = 'https://exp-tracker-render-latest.onrender.com/index.html'; 
-        } else {
-            authMsg.textContent = `Login failed: ${data.message || 'Please check your credentials and try again.'}`;
+            if (response.ok && data.userId) {
+                // Store the userId in localStorage for later use
+                localStorage.setItem('userId', data.userId);
+                // Redirect to the homepage after successful login
+                window.location.href = 'https://exp-tracker-render-latest.onrender.com/index.html';
+            } else {
+                // Display an error message if login fails
+                authMsg.textContent = `Login failed: ${data.message || 'Please check your credentials and try again.'}`;
+                authMsg.style.color = 'red';
+            }
+        } catch (err) {
+            // Display and log the error if an unexpected error occurs
+            authMsg.textContent = `Error: ${err.message || 'An unexpected error occurred. Please try again.'}`;
             authMsg.style.color = 'red';
+            console.log('Error:', err); // Log the error for debugging
         }
-    } catch (err) {
-        authMsg.textContent = `Error: ${err.message || 'An unexpected error occurred. Please try again.'}`;
-        authMsg.style.color = 'red';
-        console.log('Error:', err); // Debugging: Check any caught errors
-    }
+    });
 });
