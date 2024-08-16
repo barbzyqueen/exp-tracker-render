@@ -108,7 +108,8 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax' // 'None' for cross-site cookies in production
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for cross-site cookies in production
+        path: '/' // Ensure the cookie is accessible across the site
     }
 }));
 
@@ -141,6 +142,19 @@ app.use((req, res, next) => {
     console.log('Session Data:', req.session);
     next();
 });
+
+
+// Test Session Route
+
+app.get('/test-session', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ message: 'Session is active', session: req.session });
+    } else {
+        res.status(401).json({ message: 'No active session' });
+    }
+});
+
+
 
 // Routes for user registration, login, and expenses
 
