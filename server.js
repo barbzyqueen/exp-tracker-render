@@ -38,6 +38,54 @@ const pool = new Pool({
     port: process.env.DB_PORT || 5432,
 });
 
+
+// Test database connection and create tables
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error('Error connecting to PostgreSQL:', err.stack);
+        return;
+    }
+    console.log('Connected to PostgreSQL:', res.rows[0]);
+
+    const createTables = async () => {
+        try {
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    email VARCHAR(100) UNIQUE NOT NULL,
+                    username VARCHAR(50) NOT NULL,
+                    password VARCHAR(255) NOT NULL
+                )
+            `);
+
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS expenses (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT REFERENCES users(id),
+                    category VARCHAR(50),
+                    amount DECIMAL(10, 2),
+                    date DATE
+                )
+            `);
+
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS sessions (
+                    sid VARCHAR PRIMARY KEY,
+                    sess TEXT NOT NULL,
+                    expire TIMESTAMPTZ NOT NULL
+                )
+            `);
+
+            console.log("Tables created/checked");
+        } catch (err) {
+            console.error("Error creating tables:", err);
+        }
+    };
+
+    createTables();
+});
+
+
 // Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
@@ -264,7 +312,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
