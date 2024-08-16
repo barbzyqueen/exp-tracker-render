@@ -45,18 +45,35 @@ const sessionStore = new pgSession({
 });
 
 app.use(cookieParser());
+
 app.use(session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET || 'your_secret_key',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 600000, // 10 minutes
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
-        sameSite: 'None' // Required for cross-site cookies
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax' // 'None' for cross-site cookies in production
     }
 }));
+
+
+// app.use(session({
+//     store: sessionStore,
+//     secret: process.env.SESSION_SECRET || 'your_secret_key',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//         maxAge: 600000, // 10 minutes
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
+//         sameSite: 'None' // Required for cross-site cookies
+//     }
+// }));
+
+
 
 // Middleware to clear cookie if session doesn't exist
 app.use((req, res, next) => {
