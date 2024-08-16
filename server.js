@@ -94,12 +94,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'your_secret_key',
     resave: false,
     saveUninitialized: false,
-    rolling: true, // Extend session expiration on each request
     cookie: {
         maxAge: 86400000, // 1 day
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for cross-site cookies in production
+        secure: false, // Set this to false if you're not using HTTPS
+        sameSite: 'Lax', // Use Lax or Strict depending on your needs
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
