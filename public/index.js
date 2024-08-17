@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const apiBaseUrl = 'https://webtechhobbyist.online';
+    const apiBaseUrl = 'https://webtechhobbyist.online/';
     
     async function fetchUserData() {
         try {
