@@ -31,54 +31,11 @@ app.use(cors(corsOptions));
 
 // Database connection using Pool
 const pool = new Pool({
-    connectionString: process.env.DB_URL
-});
-
-// Test database connection and create tables
-pool.query('SELECT NOW()', (err, res) => {
-    if (err) {
-        console.error('Error connecting to PostgreSQL:', err.stack);
-        process.exit(1);  // Exit the process if the database connection fails
-    } else {
-        console.log('Connected to PostgreSQL:', res.rows[0]);
-
-        const createTables = async () => {
-            try {
-                await pool.query(`
-                    CREATE TABLE IF NOT EXISTS users (
-                        id SERIAL PRIMARY KEY,
-                        email VARCHAR(100) UNIQUE NOT NULL,
-                        username VARCHAR(50) NOT NULL,
-                        password VARCHAR(255) NOT NULL
-                    )
-                `);
-
-                await pool.query(`
-                    CREATE TABLE IF NOT EXISTS expenses (
-                        id SERIAL PRIMARY KEY,
-                        user_id INT REFERENCES users(id),
-                        category VARCHAR(50),
-                        amount DECIMAL(10, 2),
-                        date DATE
-                    )
-                `);
-
-                await pool.query(`
-                    CREATE TABLE IF NOT EXISTS sessions (
-                        sid VARCHAR PRIMARY KEY,
-                        sess JSON NOT NULL,
-                        expire TIMESTAMPTZ NOT NULL
-                    )
-                `);
-
-                console.log("Tables created/checked");
-            } catch (err) {
-                console.error("Error creating tables:", err);
-            }
-        };
-
-        createTables();
-    }
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT || 5432,
 });
 
 // Session store configuration
@@ -89,21 +46,34 @@ const sessionStore = new pgSession({
 
 app.use(cookieParser());
 
-const isProduction = process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS === 'true';
-
 app.use(session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET || 'your_secret_key',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 86400000, // 1 day
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
-        secure: isProduction, // Only true if production and FORCE_HTTPS is true
-        sameSite: isProduction ? 'None' : 'Lax',
-        path: '/'
+        secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax' // 'None' for cross-site cookies in production
     }
 }));
+
+
+// app.use(session({
+//     store: sessionStore,
+//     secret: process.env.SESSION_SECRET || 'your_secret_key',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//         maxAge: 600000, // 10 minutes
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
+//         sameSite: 'None' // Required for cross-site cookies
+//     }
+// }));
+
+
 
 // Middleware to clear cookie if session doesn't exist
 app.use((req, res, next) => {
@@ -117,24 +87,6 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     console.log('Session Data:', req.session);
     next();
-});
-
-// Middleware to log session errors
-app.use((req, res, next) => {
-    if (!req.session) {
-        console.error('Session not initialized');
-        return next(new Error('Session initialization failed'));
-    }
-    next();
-});
-
-// Test Session Route
-app.get('/test-session', (req, res) => {
-    if (req.session.user) {
-        res.status(200).json({ message: 'Session is active', session: req.session });
-    } else {
-        res.status(401).json({ message: 'No active session' });
-    }
 });
 
 // Routes for user registration, login, and expenses
@@ -174,13 +126,11 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Endpoint to get current user 
+// Endpoint to get current user information
 app.get('/api/current-user', (req, res) => {
     if (req.session.user) {
-        console.log('Current User:', req.session.user); // Log current user for debugging
         res.status(200).json({ username: req.session.user.username });
     } else {
-        console.log('No session user found');
         res.status(401).json({ message: 'Not authenticated' });
     }
 });
@@ -269,27 +219,44 @@ app.post('/api/logout', (req, res) => {
     });
 });
 
-// Route to check```javascript
-// Route to check if the server is running
+// Route to check session status
+app.get('/api/check-session', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ loggedIn: true });
+    } else {
+        res.status(200).json({ loggedIn: false });
+    }
+});
+
+// Serve static files (like the frontend)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve the homepage
 app.get('/', (req, res) => {
-    res.send('Server is running');
+    res.sendFile(path.join(__dirname, 'public', '/index.html'));
+});
+
+// Test route to verify database connectivity
+app.get('/db-test', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW()');
+        res.status(200).json({ message: "Database connection successful", timestamp: result.rows[0].now });
+    } catch (err) {
+        console.log("Database connection error:", err);
+        res.status(500).json({ message: "Database connection error", error: err });
+    }
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error('Error caught by middleware:', err.stack || err);
-    res.status(500).json({ message: "Internal Server Error", error: err.message });
-});
-
-// Static file serving for frontend
-app.use(express.static(path.join(__dirname, 'client/build')));
-
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    console.error('Errorcontinuing...', err);
+    res.status(500).json({ message: "Internal Server Error" });
 });
 
 // Start the server
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server running on port ${port}`);
 });
+
+
