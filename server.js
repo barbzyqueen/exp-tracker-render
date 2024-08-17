@@ -31,13 +31,13 @@ app.use(cors(corsOptions));
 
 // Database connection using Pool
 const pool = new Pool({
-    connectionString: process.env.DB_URL
+    connectionString: process.env.DB_URL,
 });
 
 // Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
-    tableName: 'sessions'
+    tableName: 'sessions',
 });
 
 app.use(cookieParser());
