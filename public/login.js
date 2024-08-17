@@ -9,9 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
         const authMsg = document.getElementById('auth-msg');
 
+        
+        // Construct and log the login URL
+        const loginUrl = `${apiBaseUrl}/api/login`;
+        console.log(`Login URL: ${loginUrl}`); // Check the URL in the console
+        
         try {
             // Making a POST request to the server with credentials included
-            const response = await fetch(`${apiBaseUrl}/api/login`, {
+            const response = await fetch(loginUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
