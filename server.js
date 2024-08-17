@@ -165,6 +165,15 @@ app.get('/test-session', (req, res) => {
     }
 });
 
+
+// Handling redirection
+app.use((req, res, next) => {
+    if (req.headers.host === 'webtechhobbyist.online') {
+        return res.redirect(301, 'https://www.webtechhobbyist.online' + req.url);
+    }
+    next();
+});
+
 // Logging middleware placed before all routes
 
 app.use((req, res, next) => {
@@ -176,6 +185,7 @@ app.use((req, res, next) => {
     });
     next();
 });
+
 
 
 
