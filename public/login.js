@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Making a POST request to the server with credentials included
-            const response = await fetch(`${apiBaseUrl}/api/Login`, {
+            const response = await fetch(`${apiBaseUrl}/api/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
