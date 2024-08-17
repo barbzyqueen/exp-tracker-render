@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 authMsg.style.color = 'green';
                 form.reset();
                 setTimeout(() => {
-                    window.location.href = `${apiBaseUrl}/login.html`;
+                    window.location.href = 'https://www.webtechhobbyist.online/login.html';
                 }, 2000); // Redirect after 2 seconds
             }
         } catch (err) {
