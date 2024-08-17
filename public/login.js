@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form');
-    const apiBaseUrl = 'https://www.webtechhobbyist.online/';
+    const apiBaseUrl = 'https://www.webtechhobbyist.online';
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
