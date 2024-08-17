@@ -94,6 +94,7 @@ pool.query('SELECT NOW()', (err, res) => {
 });
 
 
+
 // Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
