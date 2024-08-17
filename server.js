@@ -167,7 +167,18 @@ app.get('/test-session', (req, res) => {
 });
 
 
-// Handling redirection
+// Ensure preflight requests are handled correctly without redirection
+app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+        next(); // Skip redirection for preflight requests
+    } else if (req.headers.host === 'webtechhobbyist.online') {
+        return res.redirect(301, 'https://www.webtechhobbyist.online' + req.url);
+    } else {
+        next();
+    }
+});
+
+// Handling redirection (this will now only affect non-OPTIONS requests)
 app.use((req, res, next) => {
     if (req.headers.host === 'webtechhobbyist.online') {
         return res.redirect(301, 'https://www.webtechhobbyist.online' + req.url);
