@@ -20,8 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
 const allowedOrigins = [
-    'https://webtechhobbyist.online', // Update with your frontend URL
-    'https://www.webtechhobbyist.online'
+    'https://www.webtechhobbyist.online', // Update with your frontend URL
+    'https://webtechhobbyist.online'
 ];
 
 const corsOptions = {
