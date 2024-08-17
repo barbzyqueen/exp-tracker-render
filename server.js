@@ -136,6 +136,9 @@ app.use(session({
 
 
 
+
+
+
 // Middleware to clear cookie if session doesn't exist
 app.use((req, res, next) => {
     if (req.cookies.user_sid && !req.session.user) {
@@ -161,6 +164,21 @@ app.get('/test-session', (req, res) => {
     }
 });
 
+// Logging middleware placed before all routes
+
+app.use((req, res, next) => {
+    console.log(`Request URL: ${req.originalUrl} | Method: ${req.method}`);
+    next();
+});
+
+app.use((req, res, next) => {
+    res.on('finish', () => {
+        if (res.statusCode === 301 || res.statusCode === 302) {
+            console.log(`Redirect triggered: ${req.originalUrl} | Status Code: ${res.statusCode}`);
+        }
+    });
+    next();
+});
 
 
 // Routes for user registration, login, and expenses
