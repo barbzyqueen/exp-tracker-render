@@ -31,7 +31,7 @@ app.use(cors(corsOptions));
 
 // Database connection using Pool
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DB_URL
 });
 
 // Test database connection and create tables
