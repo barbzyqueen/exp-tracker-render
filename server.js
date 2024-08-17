@@ -57,16 +57,16 @@ pool.query('SELECT NOW()', (err, res) => {
 
     const createTables = async () => {
         try {
-            await pool.query(
+            await pool.query(`
                 CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
                     email VARCHAR(100) UNIQUE NOT NULL,
                     username VARCHAR(50) NOT NULL,
                     password VARCHAR(255) NOT NULL
                 )
-            );
+            `);
 
-            await pool.query(
+            await pool.query(`
                 CREATE TABLE IF NOT EXISTS expenses (
                     id SERIAL PRIMARY KEY,
                     user_id INT REFERENCES users(id),
@@ -74,15 +74,15 @@ pool.query('SELECT NOW()', (err, res) => {
                     amount DECIMAL(10, 2),
                     date DATE
                 )
-            );
+            `);
 
-            await pool.query(
+            await pool.query(`
                 CREATE TABLE IF NOT EXISTS sessions (
                     sid VARCHAR PRIMARY KEY,
                     sess TEXT NOT NULL,
                     expire TIMESTAMPTZ NOT NULL
                 )
-            );
+            `);
 
             console.log("Tables created/checked");
         } catch (err) {
