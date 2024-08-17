@@ -31,7 +31,7 @@ const corsOptions = {
     credentials: true // Allow cookies to be sent with requests
 };
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.options('*', cors(corsOptions));
 
