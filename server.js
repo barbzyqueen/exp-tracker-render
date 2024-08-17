@@ -9,6 +9,9 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 
 dotenv.config();
+
+const apiBaseUrl = process.env.API_BASE_URL; // API base URL for internal use if needed
+
 const { Pool } = require('pg');
 
 // Middleware
