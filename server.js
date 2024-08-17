@@ -31,17 +31,13 @@ app.use(cors(corsOptions));
 
 // Database connection using Pool
 const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT || 5432,
+    connectionString: process.env.DB_URL
 });
 
 // Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
-    tableName: 'sessions',
+    tableName: 'sessions'
 });
 
 app.use(cookieParser());
@@ -254,7 +250,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
