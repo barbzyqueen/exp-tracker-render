@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
 const allowedOrigins = [
-    'https://exp-tracker-render-latest.onrender.com' // Update with your frontend URL
+    'https://www.webtechhobbyist.online' // Update with your frontend URL
 ];
 
 const corsOptions = {
