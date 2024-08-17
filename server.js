@@ -28,7 +28,8 @@ const corsOptions = {
     origin: allowedOrigins,
     methods: 'GET, POST, PUT, DELETE, OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
-    credentials: true // Allow cookies to be sent with requests
+    credentials: true, // Allow cookies to be sent with requests
+    preflightContinue: false, // Ensure OPTIONS requests are handled correctly
 };
 
 app.use(cors(corsOptions));
@@ -168,10 +169,6 @@ app.get('/test-session', (req, res) => {
 
 app.use((req, res, next) => {
     console.log(`Request URL: ${req.originalUrl} | Method: ${req.method}`);
-    next();
-});
-
-app.use((req, res, next) => {
     res.on('finish', () => {
         if (res.statusCode === 301 || res.statusCode === 302) {
             console.log(`Redirect triggered: ${req.originalUrl} | Status Code: ${res.statusCode}`);
@@ -179,6 +176,7 @@ app.use((req, res, next) => {
     });
     next();
 });
+
 
 
 // Routes for user registration, login, and expenses
