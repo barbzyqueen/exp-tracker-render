@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form');
+    const apiBaseUrl = 'https://www.webtechhobbyist.online';
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -10,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Making a POST request to the server with credentials included
-            const response = await fetch('/api/login', {
+            const response = await fetch(`${apiBaseUrl}/api/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
