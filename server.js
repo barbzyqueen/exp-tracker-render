@@ -31,8 +31,65 @@ app.use(cors(corsOptions));
 
 // Database connection using Pool
 const pool = new Pool({
-    connectionString: process.env.DB_URL,
+    connectionString: process.env.DB_URL, // Use the environment variable for the database URL
 });
+
+// const pool = new Pool({
+//     user: process.env.DB_USER,
+//     host: process.env.DB_HOST,
+//     url: process.env.DB_URL,
+//     database: process.env.DB_NAME,
+//     password: process.env.DB_PASSWORD,
+//     port: process.env.DB_PORT || 5432,
+// });
+
+
+// Test database connection and create tables
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error('Error connecting to PostgreSQL:', err.stack);
+        return;
+    }
+    console.log('Connected to PostgreSQL:', res.rows[0]);
+
+    const createTables = async () => {
+        try {
+            await pool.query(
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    email VARCHAR(100) UNIQUE NOT NULL,
+                    username VARCHAR(50) NOT NULL,
+                    password VARCHAR(255) NOT NULL
+                )
+            );
+
+            await pool.query(
+                CREATE TABLE IF NOT EXISTS expenses (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT REFERENCES users(id),
+                    category VARCHAR(50),
+                    amount DECIMAL(10, 2),
+                    date DATE
+                )
+            );
+
+            await pool.query(
+                CREATE TABLE IF NOT EXISTS sessions (
+                    sid VARCHAR PRIMARY KEY,
+                    sess TEXT NOT NULL,
+                    expire TIMESTAMPTZ NOT NULL
+                )
+            );
+
+            console.log("Tables created/checked");
+        } catch (err) {
+            console.error("Error creating tables:", err);
+        }
+    };
+
+    createTables();
+});
+
 
 // Session store configuration
 const sessionStore = new pgSession({
@@ -51,7 +108,8 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax' // 'None' for cross-site cookies in production
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for cross-site cookies in production
+        path: '/' // Ensure the cookie is accessible across the site
     }
 }));
 
@@ -84,6 +142,19 @@ app.use((req, res, next) => {
     console.log('Session Data:', req.session);
     next();
 });
+
+
+// Test Session Route
+
+app.get('/test-session', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ message: 'Session is active', session: req.session });
+    } else {
+        res.status(401).json({ message: 'No active session' });
+    }
+});
+
+
 
 // Routes for user registration, login, and expenses
 
@@ -122,14 +193,24 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Endpoint to get current user information
+// Endpoint to get current user 
 app.get('/api/current-user', (req, res) => {
     if (req.session.user) {
+        console.log('Current User:', req.session.user); // Log current user for debugging
         res.status(200).json({ username: req.session.user.username });
     } else {
+        console.log('No session user found');
         res.status(401).json({ message: 'Not authenticated' });
     }
 });
+
+// app.get('/api/current-user', (req, res) => {
+//     if (req.session.user) {
+//         res.status(200).json({ username: req.session.user.username });
+//     } else {
+//         res.status(401).json({ message: 'Not authenticated' });
+//     }
+// });
 
 // Middleware to check if the user is authenticated
 function authenticateUser(req, res, next) {
@@ -254,5 +335,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
-
-
