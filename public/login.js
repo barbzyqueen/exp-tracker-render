@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Store the userId in localStorage for later use
                 localStorage.setItem('userId', data.userId);
                 // Redirect to the homepage after successful login
-                window.location.href = 'https://exp-tracker-render-latest.onrender.com/index.html';
+                window.location.href = 'https://www.webtechhobbyist.online/index.html';
             } else {
                 // Display an error message if login fails
                 authMsg.textContent = `Login failed: ${data.message || 'Please check your credentials and try again.'}`;
