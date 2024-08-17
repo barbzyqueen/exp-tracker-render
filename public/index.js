@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const apiBaseUrl = 'https://webtechhobbyist.online';
+    const apiBaseUrl = 'https://www.webtechhobbyist.online';
     
     async function fetchUserData() {
         try {
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('username').textContent = data.username;
         } catch (error) {
             console.error('Error fetching user info:', error);
-            window.location.href = 'https://webtechhobbyist.online/login.html';
+            window.location.href = 'https://www.webtechhobbyist.online/login.html';
         }
     }
 
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${apiBaseUrl}/api/check-session`, { method: 'GET', credentials: 'include' });
             if (!response.ok) throw new Error('Not authenticated');
         } catch (err) {
-            window.location.href = 'https://webtechhobbyist.online/login.html';
+            window.location.href = 'https://www.webtechhobbyist.online/login.html';
         }
     }
 
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                window.location.href = 'https://webtechhobbyist.online/login.html';
+                window.location.href = 'https://www.webtechhobbyist.online/login.html';
             } else {
                 console.error('Logout failed');
             }
