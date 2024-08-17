@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             authMsg.textContent = 'Registering...';
             authMsg.style.color = 'blue';
 
-            const response = await fetch('/api/register', {
+            const response = await fetch(`${apiBaseUrl}/api/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 authMsg.style.color = 'green';
                 form.reset();
                 setTimeout(() => {
-                    window.location.href = 'https://www.webtechhobbyist.online/login.html';
+                    window.location.href = `${apiBaseUrl}/login.html`;
                 }, 2000); // Redirect after 2 seconds
             }
         } catch (err) {
