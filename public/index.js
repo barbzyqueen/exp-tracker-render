@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('username').textContent = data.username;
         } catch (error) {
             console.error('Error fetching user info:', error);
-            window.location.href = 'https://exp-tracker-render-latest.onrender.com/login.html';
+            window.location.href = 'https://www.webtechhobbyist.online/login.html';
         }
     }
 
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/check-session', { method: 'GET', credentials: 'include' });
             if (!response.ok) throw new Error('Not authenticated');
         } catch (err) {
-            window.location.href = 'https://exp-tracker-render-latest.onrender.com/login.html';
+            window.location.href = 'https://www.webtechhobbyist.online/login.html';
         }
     }
 
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                window.location.href = 'https://exp-tracker-render-latest.onrender.com/login.html';
+                window.location.href = 'https://www.webtechhobbyist.online/login.html';
             } else {
                 console.error('Logout failed');
             }
