@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    const apiBaseUrl = 'https://www.webtechhobbyist.online';
+    
     async function fetchUserData() {
         try {
-            const response = await fetch('/api/current-user', { credentials: 'include' });
+            const response = await fetch(`${apiBaseUrl}/api/current-user`, { credentials: 'include' });
             if (!response.ok) throw new Error('Not authenticated');
             const data = await response.json();
             document.getElementById('username').textContent = data.username;
@@ -14,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function checkLogin() {
         try {
-            const response = await fetch('/api/check-session', { method: 'GET', credentials: 'include' });
+            const response = await fetch(`${apiBaseUrl}/api/check-session`, { method: 'GET', credentials: 'include' });
             if (!response.ok) throw new Error('Not authenticated');
         } catch (err) {
             window.location.href = 'https://www.webtechhobbyist.online/login.html';
@@ -33,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = document.getElementById('date').value;
 
         try {
-            const response = await fetch('/api/expenses', {
+            const response = await fetch(`${apiBaseUrl}/api/expenses`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -68,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = document.getElementById('editDate').value;
 
         try {
-            const response = await fetch(`/api/expenses/${expenseId}`, {
+            const response = await fetch(`${apiBaseUrl}/api/expenses/${expenseId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -98,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.style.color = 'blue';
 
         try {
-            const response = await fetch(`/api/expenses/${expenseId}`, {
+            const response = await fetch(`${apiBaseUrl}/api/expenses/${expenseId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
@@ -126,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.style.color = 'blue';
 
         try {
-            const response = await fetch('/api/expenses', {
+            const response = await fetch(`${apiBaseUrl}/api/expenses`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
@@ -172,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleLogout() {
         try {
-            const response = await fetch('/api/logout', {
+            const response = await fetch(`${apiBaseUrl}/api/logout`, {
                 method: 'POST',
                 credentials: 'include'
             });
