@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         
             try {
+            // const response = await fetch(loginUrl
             const response = await fetch('https://www.webtechhobbyist.online/api/login', {
                 method: 'POST',
                 headers: {
