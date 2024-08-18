@@ -15,35 +15,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const loginUrl = `${apiBaseUrl}/api/login`.replace(/\/\//g, '/');
         console.log(`Login URL: ${loginUrl}`); // Check the URL in the console
         
-        try {
-            // Making a POST request to the server with credentials included
+            try {
             const response = await fetch(loginUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                credentials: 'include', // Ensures cookies (e.g., session cookie) are sent with the request
+                credentials: 'include',
                 body: JSON.stringify({ email, password })
             });
-
-            const data = await response.json();
-            console.log('Response Data:', data); // Log the response data for debugging
-
+        
+            // Attempt to parse response as JSON
+            const contentType = response.headers.get('content-type');
+            let data;
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const textData = await response.text();
+                throw new Error(`Unexpected response format: ${textData}`);
+            }
+        
+            // Handle successful login
             if (response.ok && data.userId) {
-                // Store the userId in localStorage for later use
                 localStorage.setItem('userId', data.userId);
-                // Redirect to the homepage after successful login
                 window.location.href = 'https://www.webtechhobbyist.online/index.html';
             } else {
-                // Display an error message if login fails
                 authMsg.textContent = `Login failed: ${data.message || 'Please check your credentials and try again.'}`;
                 authMsg.style.color = 'red';
             }
         } catch (err) {
-            // Display and log the error if an unexpected error occurs
             authMsg.textContent = `Error: ${err.message || 'An unexpected error occurred. Please try again.'}`;
             authMsg.style.color = 'red';
             console.log('Error:', err); // Log the error for debugging
         }
+
     });
 });
