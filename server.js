@@ -362,7 +362,12 @@ app.get('/db-test', async (req, res) => {
 });
 
 // Serve static files (like the frontend)
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve static files from the 'public' directory without redirecting to a trailing slash
+app.use(express.static(path.join(__dirname, 'public'), {
+    redirect: false // Disable automatic trailing slash redirects
+}));
 
 // Serve the homepage
 app.get('/', (req, res) => {
