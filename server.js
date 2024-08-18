@@ -142,12 +142,12 @@ app.use(session({
 
 
 // Middleware to clear cookie if session doesn't exist
-app.use((req, res, next) => {
-    if (req.cookies.user_sid && !req.session.user) {
-        res.clearCookie('user_sid', { path: '/' });
-    }
-    next();
-});
+// app.use((req, res, next) => {
+//     if (req.cookies.user_sid && !req.session.user) {
+//         res.clearCookie('user_sid', { path: '/' });
+//     }
+//     next();
+// });
 
 // Middleware to debug session
 app.use((req, res, next) => {
