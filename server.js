@@ -103,9 +103,12 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
+        // secure: true,
         // secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-        sameSite: 'None', // Cookie is sent with all cross-site requests
+        // sameSite: 'None', // Cookie is sent with all cross-site requests
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
