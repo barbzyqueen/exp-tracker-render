@@ -213,7 +213,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 }));
 
 
-// Routes for user registration, login, and expenses
+// Routes for user registration, login, and expenses files
 
 // User registration route
 app.post('/api/register', async (req, res) => {
