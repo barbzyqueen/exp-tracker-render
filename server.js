@@ -104,7 +104,7 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-        sameSite: 'None', // Cookie is sent with all cross-site requests
+        sameSite: 'Lax', // Cookie is sent with all cross-site requests
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
