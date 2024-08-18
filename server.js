@@ -105,7 +105,7 @@ app.use(session({
         httpOnly: true,
         secure: true,
         // secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-        sameSite: 'none', // Cookie is sent with all cross-site requests
+        sameSite: 'None', // Cookie is sent with all cross-site requests
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
