@@ -12,8 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Construct and log the login URL
         // const loginUrl = `${apiBaseUrl}/api/login`;
-        const loginUrl = `${apiBaseUrl}/api/login`.replace(/\/\//g, '/');
-        console.log(`Login URL: ${loginUrl}`); // Check the URL in the console
+        // const loginUrl = `${apiBaseUrl}/api/login`.replace(/\/\//g, '/');
+        // console.log(`Login URL: ${loginUrl}`); // Check the URL in the console
+        const loginUrl = `${apiBaseUrl}/api/login`.replace(/([^:]\/)\/+/g, "$1");
+        console.log(`Final Login URL: ${loginUrl}`); // Log the final URL to the console
         
             try {
             const response = await fetch(loginUrl, {
