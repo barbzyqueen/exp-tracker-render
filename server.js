@@ -216,7 +216,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 // Routes for user registration, login, and expenses
 
 // User registration route
-app.post('/api/register', async (req, res) => {
+app.post('api/register', async (req, res) => {
     try {
         const { rows: existingUsers } = await pool.query('SELECT * FROM users WHERE email = $1', [req.body.email]);
         if (existingUsers.length > 0) return res.status(409).json("User already exists");
@@ -234,7 +234,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // User login route
-app.post('/api/login', async (req, res) => {
+app.post('api/login', async (req, res) => {
     try {
         const { rows: users } = await pool.query('SELECT * FROM users WHERE email = $1', [req.body.email]);
         if (users.length === 0) return res.status(404).json("User not found");
@@ -251,7 +251,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Endpoint to get current user 
-app.get('/api/current-user', (req, res) => {
+app.get('api/current-user', (req, res) => {
     if (req.session.user) {
         console.log('Current User:', req.session.user); // Log current user for debugging
         res.status(200).json({ username: req.session.user.username });
@@ -261,7 +261,7 @@ app.get('/api/current-user', (req, res) => {
     }
 });
 
-// app.get('/api/current-user', (req, res) => {
+// app.get('api/current-user', (req, res) => {
 //     if (req.session.user) {
 //         res.status(200).json({ username: req.session.user.username });
 //     } else {
@@ -278,7 +278,7 @@ function authenticateUser(req, res, next) {
 }
 
 // Route to add a new expense
-app.post('/api/expenses', authenticateUser, async (req, res) => {
+app.post('api/expenses', authenticateUser, async (req, res) => {
     const { category, amount, date } = req.body;
     const userId = req.session.user.id;
 
@@ -305,7 +305,7 @@ app.get('/api/expenses', authenticateUser, async (req, res) => {
 });
 
 // Route to update an existing expense
-app.put('/api/expenses/:id', authenticateUser, async (req, res) => {
+app.put('api/expenses/:id', authenticateUser, async (req, res) => {
     const expenseId = req.params.id;
     const { category, amount, date } = req.body;
     const userId = req.session.user.id;
@@ -324,7 +324,7 @@ app.put('/api/expenses/:id', authenticateUser, async (req, res) => {
 });
 
 // Route to delete an existing expense
-app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
+app.delete('api/expenses/:id', authenticateUser, async (req, res) => {
     const expenseId = req.params.id;
     const userId = req.session.user.id;
 
@@ -342,7 +342,7 @@ app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
 });
 
 // Logout route
-app.post('/api/logout', (req, res) => {
+app.post('api/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.log("Error logging out:", err);
@@ -354,7 +354,7 @@ app.post('/api/logout', (req, res) => {
 });
 
 // Route to check session status
-app.get('/api/check-session', (req, res) => {
+app.get('api/check-session', (req, res) => {
     if (req.session.user) {
         res.status(200).json({ loggedIn: true });
     } else {
@@ -363,7 +363,7 @@ app.get('/api/check-session', (req, res) => {
 });
 
 // Test route to verify database connectivity
-app.get('/db-test', async (req, res) => {
+app.get('db-test', async (req, res) => {
     try {
         const result = await pool.query('SELECT NOW()');
         res.status(200).json({ message: "Database connection successful", timestamp: result.rows[0].now });
