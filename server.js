@@ -355,7 +355,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve the homepage
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', '/index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Test route to verify database connectivity
