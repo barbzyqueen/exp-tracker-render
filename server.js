@@ -198,7 +198,13 @@ app.use((req, res, next) => {
     next();
 });
 
-
+// Middleware to remove trailing slashes
+app.use((req, res, next) => {
+    if (req.url.endsWith('/') && req.url.length > 1) {
+        return res.redirect(301, req.url.slice(0, -1));
+    }
+    next();
+});
 
 
 // Routes for user registration, login, and expenses
