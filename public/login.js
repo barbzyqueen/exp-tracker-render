@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         
         // Construct and log the login URL
-        const loginUrl = `${apiBaseUrl}/api/login`;
+        // const loginUrl = `${apiBaseUrl}/api/login`;
+        const loginUrl = `${apiBaseUrl}/api/login`.replace(/\/\//g, '/');
         console.log(`Login URL: ${loginUrl}`); // Check the URL in the console
         
         try {
