@@ -350,14 +350,6 @@ app.get('/api/check-session', (req, res) => {
     }
 });
 
-// Serve static files (like the frontend)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Serve the homepage
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
 // Test route to verify database connectivity
 app.get('/db-test', async (req, res) => {
     try {
@@ -368,6 +360,28 @@ app.get('/db-test', async (req, res) => {
         res.status(500).json({ message: "Database connection error", error: err });
     }
 });
+
+// Serve static files (like the frontend)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve the homepage
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Serve login page
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Serve register page
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+
+
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
