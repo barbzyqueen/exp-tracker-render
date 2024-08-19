@@ -161,17 +161,17 @@ app.use((req, res, next) => {
 });
 
 
-app.get('/api/current-user', authenticateUser, (req, res) => {
-    res.status(200).json(req.session.user);
-});
+// app.get('/api/current-user', authenticateUser, (req, res) => {
+//     res.status(200).json(req.session.user);
+// });
 
-app.get('/api/check-session', (req, res) => {
-    if (req.session.user) {
-        res.status(200).json({ authenticated: true });
-    } else {
-        res.status(401).json({ authenticated: false });
-    }
-});
+// app.get('/api/check-session', (req, res) => {
+//     if (req.session.user) {
+//         res.status(200).json({ authenticated: true });
+//     } else {
+//         res.status(401).json({ authenticated: false });
+//     }
+// });
 
 
 // Serve static files from the 'public' directory without redirecting to a trailing slash
@@ -224,6 +224,14 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Middleware to check if the user is authenticated
+app.get('/api/current-user', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ username: req.session.user.username });
+    } else {
+        res.status(401).json({ message: 'Not authenticated' });
+    }
+});
+
 function authenticateUser(req, res, next) {
     if (!req.session.user) {
         return res.status(401).json("Unauthorized");
@@ -305,6 +313,14 @@ app.post('/api/logout', (req, res) => {
         res.clearCookie('connect.sid'); // Clear the session cookie
         res.status(200).json("Logout successful");
     });
+});
+
+app.get('/api/check-session', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ loggedIn: true });
+    } else {
+        res.status(200).json({ loggedIn: false });
+    }
 });
 
 // Error handling middleware
