@@ -21,7 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 // CORS configuration
 const allowedOrigins = [
     'https://webtechhobbyist.online', // Update with your frontend URL
-    'https://www.webtechhobbyist.online'
+    'https://www.webtechhobbyist.online',
+    'https://exp-tracker-render-latest.onrender.com'
 ];
 
 const corsOptions = {
@@ -106,9 +107,6 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
-        // secure: true,
-        // secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-        // sameSite: 'None', // Cookie is sent with all cross-site requests
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
@@ -120,15 +118,14 @@ app.use((req, res, next) => {
 });
 
 // Test Session Route
-if (process.env.NODE_ENV !== 'production') {
-    app.get('/test-session', (req, res) => {
-        if (req.session.user) {
-            res.status(200).json({ message: 'Session is active', session: req.session });
-        } else {
-            res.status(401).json({ message: 'No active session' });
-        }
-    });
-}
+app.get('/test-session', (req, res) => {
+    if (req.session.views) {
+        req.session.views++;
+    } else {
+        req.session.views = 1;
+    }
+    res.status(200).json({ message: 'Session is active', session: req.session });
+});
 
 // Logging middleware placed before all routes
 app.use((req, res, next) => {
@@ -266,7 +263,7 @@ app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
         res.status(200).json("Expense deleted successfully");
     } catch (err) {
         console.log("Error deleting expense:", err);
-        res.status(400).json("Error deleting expense");
+        res.status(400).json("Error deletingexpense");
     }
 });
 
