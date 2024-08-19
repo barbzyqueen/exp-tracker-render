@@ -142,12 +142,12 @@ app.use((req, res, next) => {
 });
 
 // Middleware to remove trailing slashes
-app.use((req, res, next) => {
-    if (req.url.endsWith('/') && req.url.length > 1) {
-        return res.redirect(301, req.url.slice(0, -1));
-    }
-    next();
-});
+// app.use((req, res, next) => {
+//     if (req.url.endsWith('/') && req.url.length > 1) {
+//         return res.redirect(301, req.url.slice(0, -1));
+//     }
+//     next();
+// });
 
 // Serve static files from the 'public' directory without redirecting to a trailing slash
 app.use(express.static(path.join(__dirname, 'public'), {
