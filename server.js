@@ -110,8 +110,8 @@ app.use(session({
         httpOnly: true,
         // secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
         // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: true,
-        sameSite: 'none',
+        secure: false,
+        sameSite: 'lax',
         domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
         // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
         path: '/' // Ensure the cookie is accessible across the site
