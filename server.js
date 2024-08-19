@@ -14,28 +14,6 @@ const apiBaseUrl = process.env.API_BASE_URL; // API base URL for internal use if
 
 const { Pool } = require('pg');
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// CORS configuration
-const allowedOrigins = [
-    'https://webtechhobbyist.online', // Update with your frontend URL
-    'https://www.webtechhobbyist.online',
-    'https://exp-tracker-render-latest.onrender.com'
-];
-
-const corsOptions = {
-    origin: allowedOrigins,
-    methods: 'GET, POST, PUT, DELETE, OPTIONS',
-    allowedHeaders: 'Content-Type, Authorization',
-    credentials: true, // Allow cookies to be sent with requests
-    preflightContinue: false, // Ensure OPTIONS requests are handled correctly
-};
-
-app.use(cors(corsOptions));
-
-app.options('*', cors(corsOptions));
 
 // Database connection using Pool
 const pool = new Pool({
@@ -88,13 +66,39 @@ pool.query('SELECT NOW()', (err, res) => {
     createTables();
 });
 
+
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+// CORS configuration
+const allowedOrigins = [
+    'https://webtechhobbyist.online', // Update with your frontend URL
+    'https://www.webtechhobbyist.online',
+    'https://exp-tracker-render-latest.onrender.com'
+];
+
+const corsOptions = {
+    origin: allowedOrigins,
+    methods: 'GET, POST, PUT, DELETE, OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true, // Allow cookies to be sent with requests
+    preflightContinue: false, // Ensure OPTIONS requests are handled correctly
+};
+
+app.use(cors(corsOptions));
+
+app.options('*', cors(corsOptions));
+
+app.use(cookieParser());
+
 // Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
     tableName: 'sessions',
 });
-
-app.use(cookieParser());
 
 app.use(session({
     store: sessionStore,
@@ -108,7 +112,7 @@ app.use(session({
         // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         secure: true,
         sameSite: 'none',
-        domain: '.webtechhobbyist.online',
+        domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
         // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
         path: '/' // Ensure the cookie is accessible across the site
     }
@@ -148,6 +152,27 @@ app.use((req, res, next) => {
 //     }
 //     next();
 // });
+
+
+
+app.use((req, res, next) => {
+    console.log('Session:', req.session);
+    next();
+});
+
+
+app.get('/api/current-user', authenticateUser, (req, res) => {
+    res.status(200).json(req.session.user);
+});
+
+app.get('/api/check-session', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ authenticated: true });
+    } else {
+        res.status(401).json({ authenticated: false });
+    }
+});
+
 
 // Serve static files from the 'public' directory without redirecting to a trailing slash
 app.use(express.static(path.join(__dirname, 'public'), {
