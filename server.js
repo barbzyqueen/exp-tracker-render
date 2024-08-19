@@ -104,8 +104,10 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        // secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
+        // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: true,
+        sameSite: 'none',
         domain: '.webtechhobbyist.online',
         // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
         path: '/' // Ensure the cookie is accessible across the site
