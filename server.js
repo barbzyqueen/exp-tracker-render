@@ -85,7 +85,7 @@ const corsOptions = {
     methods: 'GET, POST, PUT, DELETE, OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true, // Allow cookies to be sent with requests
-    preflightContinue: false, // Ensure OPTIONS requests are handled correctly
+    preflightContinue: false // Ensure OPTIONS requests are handled correctly
 };
 
 app.use(cors(corsOptions));
@@ -97,7 +97,7 @@ app.use(cookieParser());
 // Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
-    tableName: 'sessions',
+    tableName: 'sessions'
 });
 
 app.use(session({
@@ -110,8 +110,8 @@ app.use(session({
         httpOnly: true,
         // secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
         // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: false,
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
         // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
         path: '/' // Ensure the cookie is accessible across the site
@@ -224,13 +224,18 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Middleware to check if the user is authenticated
-app.get('/api/current-user', (req, res) => {
-    if (req.session.user) {
-        res.status(200).json({ username: req.session.user.username });
-    } else {
-        res.status(401).json({ message: 'Not authenticated' });
-    }
+app.get('/api/current-user', authenticateUser, (req, res) => {
+    res.status(200).json(req.session.user);
 });
+
+// app.get('/api/current-user', (req, res) => {
+//     if (req.session.user) {
+//         res.status(200).json({ username: req.session.user.username });
+//         res.status(200).json(req.session.user);
+//     } else {
+//         res.status(401).json({ message: 'Not authenticated' });
+//     }
+// });
 
 function authenticateUser(req, res, next) {
     if (!req.session.user) {
