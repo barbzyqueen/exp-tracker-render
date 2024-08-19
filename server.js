@@ -106,7 +106,8 @@ app.use(session({
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
+        domain: '.webtechhobbyist.online',
+        // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
