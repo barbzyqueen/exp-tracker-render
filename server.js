@@ -100,6 +100,9 @@ const sessionStore = new pgSession({
     tableName: 'sessions'
 });
 
+// Enable trust proxy
+app.set('trust proxy', true);
+
 app.use(session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET,
