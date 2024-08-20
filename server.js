@@ -120,9 +120,9 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-        secure: true, // Cookie will only be sent over HTTPS
-        sameSite: 'None', // Cookie is sent with all cross-site requests
-        domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
+        secure: false, // Cookie will only be sent over HTTPS
+        sameSite: 'Lax', // Cookie is sent with all cross-site requests
+        // domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
