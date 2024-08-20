@@ -103,7 +103,8 @@ const sessionStore = new pgSession({
 app.use(session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET,
-    resave: false,
+    rolling: true,
+    resave: true,
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
