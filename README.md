@@ -1,4 +1,6 @@
-# Expense Tracker
+# Expense Tracker link:
+https://www.webtechhobbyist.online/register.html
+
 # Description:
 This a simple Expense Tracker Application built using Node JS.
 The project was stored as a Docker image and finally deployed on Render.
@@ -10,5 +12,4 @@ The project was stored as a Docker image and finally deployed on Render.
 - A user can view their expenses
 - A user can delete their expenses
 
-# Application Link:
-https://www.webtechhobbyist.online/register.html
+
