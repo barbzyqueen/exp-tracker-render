@@ -15,10 +15,21 @@ const apiBaseUrl = process.env.API_BASE_URL; // API base URL for internal use if
 const { Pool } = require('pg');
 
 
+
 // Database connection using Pool
 const pool = new Pool({
     connectionString: process.env.DB_URL, // Use the environment variable for the database URL
 });
+
+// const pool = new Pool({
+//     user: process.env.DB_USER,
+//     host: process.env.DB_HOST,
+//     url: process.env.DB_URL,
+//     database: process.env.DB_NAME,
+//     password: process.env.DB_PASSWORD,
+//     port: process.env.DB_PORT || 5432,
+// });
+
 
 // Test database connection and create tables
 pool.query('SELECT NOW()', (err, res) => {
@@ -67,11 +78,9 @@ pool.query('SELECT NOW()', (err, res) => {
 });
 
 
-
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 // CORS configuration
 const allowedOrigins = [
@@ -85,20 +94,22 @@ const corsOptions = {
     methods: 'GET, POST, PUT, DELETE, OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true, // Allow cookies to be sent with requests
-    preflightContinue: false // Ensure OPTIONS requests are handled correctly
+    preflightContinue: false, // Ensure OPTIONS requests are handled correctly
 };
 
 app.use(cors(corsOptions));
 
 app.options('*', cors(corsOptions));
 
-app.use(cookieParser());
+
 
 // Session store configuration
 const sessionStore = new pgSession({
     pool: pool,
-    tableName: 'sessions'
+    tableName: 'sessions',
 });
+
+app.use(cookieParser());
 
 app.use(session({
     store: sessionStore,
@@ -108,15 +119,41 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
-        // secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
-        // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: auto,
-        sameSite: 'none',
-        domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
-        // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
+        secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+        secure: true, // Cookie will only be sent over HTTPS
+        sameSite: 'None', // Cookie is sent with all cross-site requests
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
+
+
+
+
+// app.use(session({
+//     store: sessionStore,
+//     secret: process.env.SESSION_SECRET || 'your_secret_key',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//         maxAge: 600000, // 10 minutes
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
+//         sameSite: 'None' // Required for cross-site cookies
+//     }
+// }));
+
+
+
+
+
+
+// Middleware to clear cookie if session doesn't exist
+// app.use((req, res, next) => {
+//     if (req.cookies.user_sid && !req.session.user) {
+//         res.clearCookie('user_sid', { path: '/' });
+//     }
+//     next();
+// });
 
 // Middleware to debug session
 app.use((req, res, next) => {
@@ -124,17 +161,39 @@ app.use((req, res, next) => {
     next();
 });
 
+
 // Test Session Route
+
 app.get('/test-session', (req, res) => {
-    if (req.session.views) {
-        req.session.views++;
+    if (req.session.user) {
+        res.status(200).json({ message: 'Session is active', session: req.session });
     } else {
-        req.session.views = 1;
+        res.status(401).json({ message: 'No active session' });
     }
-    res.status(200).json({ message: 'Session is active', session: req.session });
 });
 
+
+// Ensure preflight requests are handled correctly without redirection
+// app.use((req, res, next) => {
+//     if (req.method === 'OPTIONS') {
+//         next(); // Skip redirection for preflight requests
+//     } else if (req.headers.host === 'webtechhobbyist.online') {
+//         return res.redirect(301, 'https://www.webtechhobbyist.online' + req.url);
+//     } else {
+//         next();
+//     }
+// });
+
+// Handling redirection (this will now only affect non-OPTIONS requests)
+// app.use((req, res, next) => {
+//     if (req.headers.host === 'webtechhobbyist.online') {
+//         return res.redirect(301, 'https://www.webtechhobbyist.online' + req.url);
+//     }
+//     next();
+// });
+
 // Logging middleware placed before all routes
+
 app.use((req, res, next) => {
     console.log(`Request URL: ${req.originalUrl} | Method: ${req.method}`);
     res.on('finish', () => {
@@ -146,38 +205,19 @@ app.use((req, res, next) => {
 });
 
 // Middleware to remove trailing slashes
-// app.use((req, res, next) => {
-//     if (req.url.endsWith('/') && req.url.length > 1) {
-//         return res.redirect(301, req.url.slice(0, -1));
-//     }
-//     next();
-// });
-
-
-
 app.use((req, res, next) => {
-    console.log('Session:', req.session);
+    if (req.url.endsWith('/') && req.url.length > 1) {
+        return res.redirect(301, req.url.slice(0, -1));
+    }
     next();
 });
 
 
-// app.get('/api/current-user', authenticateUser, (req, res) => {
-//     res.status(200).json(req.session.user);
-// });
-
-// app.get('/api/check-session', (req, res) => {
-//     if (req.session.user) {
-//         res.status(200).json({ authenticated: true });
-//     } else {
-//         res.status(401).json({ authenticated: false });
-//     }
-// });
-
-
 // Serve static files from the 'public' directory without redirecting to a trailing slash
-app.use(express.static(path.join(__dirname, 'public'), {
-    redirect: false // Disable automatic trailing slash redirects
-}));
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+// Routes for user registration, login, and expenses files
 
 // User registration route
 app.post('/api/register', async (req, res) => {
@@ -208,35 +248,72 @@ app.post('/api/login', async (req, res) => {
 
         req.session.user = users[0];
         
-        // Saving Session and handling response
+        // Saving Session
+        req.session.save((err) => {
+            if (err) {
+                console.error("Error saving session:", err);
+            } else {
+                console.log('Session saved successfully:', req.session);
+            }
+        });
+
+        // Log session data after it's set
+        console.log('Session Data After Login:', req.session);
+
         req.session.save((err) => {
             if (err) {
                 console.error("Session save error:", err);
                 return res.status(500).json("Session save error");
             }
-            console.log('Session saved successfully:', req.session);
             res.status(200).json({ message: "Login successful", userId: users[0].id });
         });
+        // res.status(200).json({ message: "Login successful", userId: users[0].id });
     } catch (err) {
         console.log("Internal server error:", err);
         res.status(500).json("Internal Server Error");
     }
 });
 
-// Middleware to check if the user is authenticated
-app.get('/api/current-user', authenticateUser, (req, res) => {
-    res.status(200).json(req.session.user);
+
+
+if (process.env.NODE_ENV !== 'production') {
+    app.get('/test-session', (req, res) => {
+        if (req.session.user) {
+            res.status(200).json({ message: 'Session is active', session: req.session });
+        } else {
+            res.status(401).json({ message: 'No active session' });
+        }
+    });
+}
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({ message: "Internal Server Error" });
+});
+
+
+
+// Endpoint to get current user 
+app.get('/api/current-user', (req, res) => {
+    if (req.session.user) {
+        console.log('Current User:', req.session.user); // Log current user for debugging
+        res.status(200).json({ username: req.session.user.username });
+    } else {
+        console.log('No session user found');
+        res.status(401).json({ message: 'Not authenticated' });
+    }
 });
 
 // app.get('/api/current-user', (req, res) => {
 //     if (req.session.user) {
 //         res.status(200).json({ username: req.session.user.username });
-//         res.status(200).json(req.session.user);
 //     } else {
 //         res.status(401).json({ message: 'Not authenticated' });
 //     }
 // });
 
+// Middleware to check if the user is authenticated
 function authenticateUser(req, res, next) {
     if (!req.session.user) {
         return res.status(401).json("Unauthorized");
@@ -262,9 +339,17 @@ app.post('/api/expenses', authenticateUser, async (req, res) => {
 app.get('/api/expenses', authenticateUser, async (req, res) => {
     const userId = req.session.user.id;
 
+    // Log the session data when this route is accessed
+    console.log('Session Data on /api/current-user Request:', userId);
+
     try {
         const { rows: expenses } = await pool.query('SELECT * FROM expenses WHERE user_id = $1 ORDER BY date DESC', [userId]);
-        res.status(200).json(expenses);
+        if (req.session.user) {
+        res.status(200).json({ username: req.session.user.username });
+        } else {
+            res.status(401).json({ message: 'Not authenticated' });
+        }
+        // res.status(200).json(expenses);
     } catch (err) {
         console.log("Error retrieving expenses:", err);
         res.status(400).json("Error retrieving expenses");
@@ -304,22 +389,27 @@ app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
         res.status(200).json("Expense deleted successfully");
     } catch (err) {
         console.log("Error deleting expense:", err);
-        res.status(400).json("Error deletingexpense");
+        res.status(400).json("Error deleting expense");
     }
 });
 
 // Logout route
 app.post('/api/logout', (req, res) => {
-    req.session.destroy(err => {
+    // Log the session data before it's destroyed
+    console.log('Session Data Before Logout:', req.session);
+    
+    req.session.destroy((err) => {
         if (err) {
             console.log("Error logging out:", err);
             return res.status(500).json("Error logging out");
         }
-        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.clearCookie('user_sid', { path: '/' });
+        console.log('Session Destroyed');
         res.status(200).json("Logout successful");
     });
 });
 
+// Route to check session status
 app.get('/api/check-session', (req, res) => {
     if (req.session.user) {
         res.status(200).json({ loggedIn: true });
@@ -328,14 +418,49 @@ app.get('/api/check-session', (req, res) => {
     }
 });
 
+// Test route to verify database connectivity
+app.get('/db-test', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW()');
+        res.status(200).json({ message: "Database connection successful", timestamp: result.rows[0].now });
+    } catch (err) {
+        console.log("Database connection error:", err);
+        res.status(500).json({ message: "Database connection error", error: err });
+    }
+});
+
+// Serve static files (like the frontend)
+// app.use(express.static(path.join(__dirname, 'public')));
+
+
+
+// Serve the homepage
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Serve login page
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Serve register page
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+
+
+
+
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error("Server error:", err.stack);
-    res.status(500).json("Internal Server Error");
+    console.error('Errorcontinuing...', err);
+    res.status(500).json({ message: "Internal Server Error" });
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
