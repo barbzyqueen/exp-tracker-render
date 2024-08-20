@@ -121,7 +121,7 @@ app.use(session({
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
         secure: false, // Cookie will only be sent over HTTPS
-        sameSite: 'Lax', // Cookie is sent with all cross-site requests
+        sameSite: 'lax', // Cookie is sent with all cross-site requests
         // domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
         path: '/' // Ensure the cookie is accessible across the site
     }
