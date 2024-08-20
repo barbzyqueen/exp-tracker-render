@@ -165,7 +165,7 @@ app.use((req, res, next) => {
 
 // Test Session Route
 
-app.get('/test-session', (req, res) => {
+app.get('api/test-session', (req, res) => {
     if (req.session.user) {
         res.status(200).json({ message: 'Session is active', session: req.session });
     } else {
@@ -278,7 +278,7 @@ app.post('/api/login', async (req, res) => {
 
 
 if (process.env.NODE_ENV !== 'production') {
-    app.get('/test-session', (req, res) => {
+    app.get('api/test-session', (req, res) => {
         if (req.session.user) {
             res.status(200).json({ message: 'Session is active', session: req.session });
         } else {
