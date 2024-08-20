@@ -110,7 +110,7 @@ app.use(session({
         httpOnly: true,
         // secure: process.env.NODE_ENV === 'production', // Ensure HTTPS in production
         // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: auto,
+        secure: true,
         sameSite: 'none',
         domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
         // domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
