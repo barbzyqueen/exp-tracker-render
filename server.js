@@ -122,6 +122,7 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
         secure: true, // Cookie will only be sent over HTTPS
         sameSite: 'None', // Cookie is sent with all cross-site requests
+        domain: process.env.NODE_ENV === 'production' ? '.webtechhobbyist.online' : undefined,
         path: '/' // Ensure the cookie is accessible across the site
     }
 }));
